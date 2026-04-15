@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>心情丝带 | 匿名树洞</title>
+  <!-- 引入Firebase兼容版CDN -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <!-- 引入样式 -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 网站标题（新增在线人数） -->
+  <div class="header">
+    <h1>🎀 心情丝带</h1>
+    <p>匿名写下你的心事，系上丝带随风飘走</p>
+    <p style="color:#d885a3; font-size:14px;" id="onlineCount">当前在线：0人</p>
+  </div>
+
+  <!-- 发布框（新增情绪分类） -->
+  <div class="publish-box">
+    <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+      <select id="emotion" style="flex: 1; padding: 8px; border: 1px solid #eee; border-radius: 8px; font-size: 16px;">
+        <option value="无">✨ 选择情绪</option>
+        <option value="开心">😊 开心</option>
+        <option value="难过">😢 难过</option>
+        <option value="压力">😰 压力</option>
+        <option value="失恋">💔 失恋</option>
+        <option value="委屈">🥺 委屈</option>
+        <option value="迷茫">😶 迷茫</option>
+      </select>
+    </div>
+    <textarea id="content" placeholder="写下你想说的话，无人知晓..."></textarea>
+    <button onclick="publishRibbon()">系上丝带 🎀</button>
+  </div>
+
+  <!-- 丝带展示区域 -->
+  <div class="ribbon-container" id="ribbonList"></div>
+
+  <!-- 引入功能代码 -->
+  <script src="script.js"></script>
+</body>
+</html>
