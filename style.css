@@ -6,20 +6,18 @@
   font-family: "Microsoft YaHei", sans-serif;
 }
 
-/* 背景容器：核心是自动随机切换 + 渐变过渡 */
+/* 背景容器：自动随机切换 + 渐变过渡 */
 body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
   position: relative;
-  /* 默认背景 */
   background: url('bg-summer.jpg') no-repeat center center;
   background-size: cover;
-  /* 背景切换动画 */
   transition: background 1.5s ease-in-out;
 }
 
-/* 絮语样式（原站深色半透明） */
+/* 絮语样式 */
 .whisper {
   position: absolute;
   padding: 10px 15px;
@@ -75,7 +73,7 @@ body {
   cursor: pointer;
 }
 
-/* 顶部右侧：到访数、在线数、场景显示 */
+/* 顶部右侧：到访数、在线数、场景 */
 .header-right {
   position: absolute;
   top: 20px;
@@ -93,7 +91,7 @@ body {
   font-size: 12px;
 }
 
-/* 右下角功能按钮 */
+/* 右下角功能按钮（改“心心絮语”样式） */
 .footer-right {
   position: absolute;
   bottom: 20px;
@@ -125,7 +123,7 @@ body {
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-/* 输入弹窗 */
+/* 发布弹窗样式 */
 .input-modal {
   position: fixed;
   top: 50%;
@@ -156,4 +154,137 @@ body {
   padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
+}
+
+/* 絮语详情弹窗（核心：评论+点赞） */
+.detail-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.9);
+  padding: 25px;
+  border-radius: 8px;
+  width: 450px;
+  color: #fff;
+  display: none;
+  z-index: 999;
+}
+
+/* 主絮语内容 */
+.detail-main {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+.detail-main #detail-content {
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.detail-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #ccc;
+  margin-bottom: 8px;
+}
+
+.detail-like {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.heart-icon {
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.heart-icon.active {
+  color: #ff4444;
+  transform: scale(1.1);
+}
+
+.detail-tip {
+  font-size: 13px;
+  color: #999;
+  font-style: italic;
+}
+
+/* 评论列表 */
+.reply-list {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 单条评论样式 */
+.reply-item {
+  padding: 10px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 4px;
+}
+
+.reply-content {
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.reply-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #ccc;
+}
+
+.reply-like {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+}
+
+/* 评论输入框 */
+.reply-input-area {
+  margin-bottom: 15px;
+}
+
+.reply-input {
+  width: 100%;
+  height: 80px;
+  padding: 10px;
+  background: rgba(255,255,255,0.9);
+  border: none;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  resize: none;
+  font-size: 14px;
+}
+
+.reply-submit-btn {
+  background: #e6b800;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  float: right;
+}
+
+/* 作者追加内容 */
+.author-add {
+  font-size: 12px;
+  color: #ccc;
+}
+
+.author-add input {
+  margin-right: 5px;
 }

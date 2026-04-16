@@ -18,23 +18,56 @@
     </div>
   </div>
 
-  <!-- 顶部右侧：到访数、在线数、场景（仅显示，不手动切换） -->
+  <!-- 顶部右侧：真实到访数、在线数、场景 -->
   <div class="header-right">
     <span id="visit-count">0 人到访过</span>
     <span id="online-count">0 人在线</span>
     <div class="scene-display" id="scene-display">夏·夜晚</div>
   </div>
 
-  <!-- 右下角功能区（删凭码查看） -->
+  <!-- 右下角功能区（改“系上一条”为“心心絮语”） -->
   <div class="footer-right">
     <button class="my-whisper-btn">我的絮语</button>
-    <button class="publish-btn">+ 系上一条</button>
+    <button class="publish-btn">+ 心心絮语</button>
   </div>
 
-  <!-- 输入弹窗（默认隐藏） -->
+  <!-- 发布絮语弹窗（默认隐藏） -->
   <div class="input-modal" id="input-modal">
     <textarea class="input-text" id="input-text" placeholder="写下你的心里话吧～"></textarea>
     <button class="submit-btn" id="submit-btn">发布</button>
+  </div>
+
+  <!-- 絮语详情弹窗（评论+点赞，默认隐藏） -->
+  <div class="detail-modal" id="detail-modal">
+    <!-- 主絮语内容 -->
+    <div class="detail-main">
+      <p id="detail-content">想要构建体系，让体系去自然而然的流动和发生，人去跟太累了。</p>
+      <div class="detail-meta">
+        <span id="detail-reply-count">回响 · 1</span>
+        <div class="detail-like">
+          <span id="detail-like-count">0</span>
+          <span class="heart-icon" id="detail-heart">❤️</span>
+        </div>
+      </div>
+      <p class="detail-tip" id="detail-tip">树洞 让体系呼吸，你只需轻轻在旁。</p>
+    </div>
+
+    <!-- 评论区 -->
+    <div class="reply-list" id="reply-list">
+      <!-- 评论会动态生成 -->
+    </div>
+
+    <!-- 评论输入框 -->
+    <div class="reply-input-area">
+      <textarea class="reply-input" id="reply-input" placeholder="写下你的回响（50字以内）…"></textarea>
+      <button class="reply-submit-btn" id="reply-submit-btn">留下回响</button>
+    </div>
+
+    <!-- 作者追加内容（占位） -->
+    <div class="author-add">
+      <input type="checkbox" id="author-check">
+      <label for="author-check">我是这条絮语的作者，想追加内容</label>
+    </div>
   </div>
 
   <script src="script.js"></script>
