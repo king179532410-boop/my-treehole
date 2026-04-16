@@ -3,42 +3,56 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>心情丝带 | 匿名树洞</title>
-  <!-- 引入Firebase兼容版CDN -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  <!-- 引入样式 -->
+  <title>TiedStory - 丝带树洞</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- 网站标题（新增在线人数） -->
-  <div class="header">
-    <h1>🎀 心情丝带</h1>
-    <p>匿名写下你的心事，系上丝带随风飘走</p>
-    <p style="color:#d885a3; font-size:14px;" id="onlineCount">当前在线：0人</p>
-  </div>
-
-  <!-- 发布框（新增情绪分类） -->
-  <div class="publish-box">
-    <div style="display: flex; gap: 10px; margin-bottom: 12px;">
-      <select id="emotion" style="flex: 1; padding: 8px; border: 1px solid #eee; border-radius: 8px; font-size: 16px;">
-        <option value="无">✨ 选择情绪</option>
-        <option value="开心">😊 开心</option>
-        <option value="难过">😢 难过</option>
-        <option value="压力">😰 压力</option>
-        <option value="失恋">💔 失恋</option>
-        <option value="委屈">🥺 委屈</option>
-        <option value="迷茫">😶 迷茫</option>
-      </select>
+  <!-- 顶部左侧logo和标语 -->
+  <div class="header-left">
+    <h1>TiedStory</h1>
+    <p>每一条丝带，都是你认真生活的证明</p>
+    <div class="stats">
+      <span>共 <span id="ribbon-count">0</span> 条丝带</span>
+      <button class="random-btn">随机遇见</button>
+      <button class="all-btn">查看全部</button>
     </div>
-    <textarea id="content" placeholder="写下你想说的话，无人知晓..."></textarea>
-    <button onclick="publishRibbon()">系上丝带 🎀</button>
   </div>
 
-  <!-- 丝带展示区域 -->
-  <div class="ribbon-container" id="ribbonList"></div>
+  <!-- 顶部右侧：访问数、在线数、场景、语言 -->
+  <div class="header-right">
+    <span id="visit-count">808 人到访过</span>
+    <span id="online-count">77 人在线</span>
+    <div class="scene-selector" id="scene-btn">夏·夜晚</div>
+    <div class="lang-selector" id="lang-btn">CN</div>
+  </div>
 
-  <!-- 引入功能代码 -->
+  <!-- 右下角功能区 -->
+  <div class="footer-right">
+    <button class="my-ribbon-btn">我的丝带</button>
+    <button class="code-btn">凭码查看</button>
+    <button class="publish-btn">+ 系上一条</button>
+  </div>
+
+  <!-- 输入弹窗（默认隐藏） -->
+  <div class="input-modal" id="input-modal">
+    <textarea class="input-text" id="input-text" placeholder="写下你的心里话吧～"></textarea>
+    <button class="submit-btn" id="submit-btn">发布</button>
+  </div>
+
+  <!-- 语言切换弹窗（默认隐藏） -->
+  <div class="lang-modal" id="lang-modal">
+    <button class="lang-item" data-lang="cn">中文</button>
+    <button class="lang-item" data-lang="en">English</button>
+  </div>
+
+  <!-- 场景切换弹窗（默认隐藏） -->
+  <div class="scene-modal" id="scene-modal">
+    <button class="scene-item" data-scene="spring">春·夜晚</button>
+    <button class="scene-item" data-scene="summer">夏·夜晚</button>
+    <button class="scene-item" data-scene="autumn">秋·夜晚</button>
+    <button class="scene-item" data-scene="winter">冬·夜晚</button>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>
