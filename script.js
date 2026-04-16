@@ -33,6 +33,25 @@ const colorMoodMap = Object.fromEntries(Object.entries(moodColorMap).map(([k,v])
 
 let db;
 
+// 新增：显示无数据或加载失败的提示
+function showNoWhisperTip() {
+  // 如果已经存在提示则不重复添加
+  if (document.getElementById('no-whisper-tip')) return;
+  
+  const tip = document.createElement('div');
+  tip.id = 'no-whisper-tip';
+  tip.style.position = 'fixed';
+  tip.style.top = '50%';
+  tip.style.left = '50%';
+  tip.style.transform = 'translate(-50%, -50%)';
+  tip.style.color = '#C8C0B0';
+  tip.style.fontSize = '16px';
+  tip.style.textAlign = 'center';
+  tip.style.zIndex = '9999';
+  tip.innerHTML = '风很轻，云很淡<br>暂无心念回响<br><span style="font-size:12px; opacity:0.7;">(若持续显示请检查网络连接)</span>';
+  document.body.appendChild(tip);
+}
+
 window.onload = function(){
   const bgContainer = document.createElement('div');
   bgContainer.id = 'bg-container';
@@ -46,30 +65,60 @@ window.onload = function(){
   
   if (!window.firebase) {
     const script = document.createElement('script');
-    // 【修改点】使用 compat 版本以支持全局 firebase 变量
     script.src = 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js';
+    
+    // 主 Firebase 脚本加载失败容错
+    script.onerror = () => {
+      showNoWhisperTip();
+      alert("核心功能加载失败，请检查网络或稍后重试");
+    };
+
     script.onload = () => {
       const dbScript = document.createElement('script');
-      // 【修改点】使用 compat 版本
       dbScript.src = 'https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js';
-      dbScript.onload = initFirebase;
+      
+      // 增加 script 加载失败的容错
+      dbScript.onerror = () => {
+        showNoWhisperTip();
+        alert("数据模块加载失败，请检查网络或稍后重试");
+      };
+
+      dbScript.onload = () => {
+        // 增加 Firebase 加载后的错误捕获
+        initFirebase().then(() => {
+          syncWhispersFromCloud();
+        }).catch((err) => {
+          console.error("Firebase Init Error:", err);
+          showNoWhisperTip();
+          updateWhisperCount();
+        });
+      };
       document.head.appendChild(dbScript);
     };
     document.head.appendChild(script);
   } else {
     initFirebase().then(() => {
       syncWhispersFromCloud();
+    }).catch((err) => {
+      console.error("Firebase Init Error:", err);
+      showNoWhisperTip();
+      updateWhisperCount();
     });
   }
 };
 
 function initFirebase() {
-  return new Promise((resolve) => {
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
+  return new Promise((resolve, reject) => {
+    try {
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
+      db = firebase.database();
+      resolve();
+    } catch (error) {
+      console.error("Firebase 初始化失败：", error);
+      reject(error); // 捕获错误，避免阻塞
     }
-    db = firebase.database();
-    resolve();
   });
 }
 
@@ -78,10 +127,25 @@ function syncWhispersFromCloud() {
   whispersRef.on('value', (snapshot) => {
     const cloudData = snapshot.val() || {};
     whispers = Object.values(cloudData);
+    
+    // 移除旧的 whisper 元素
     document.querySelectorAll('.whisper').forEach(el => el.remove());
+    
+    // 如果有数据，移除提示
+    if (whispers.length > 0) {
+      const tip = document.getElementById('no-whisper-tip');
+      if (tip) tip.remove();
+    } else {
+      // 如果云端没数据，也显示提示
+      showNoWhisperTip();
+    }
+
     whispers.forEach((w, i) => renderWhisper(w, i));
     updateWhisperCount();
     keepMinCount();
+  }, (error) => {
+    console.error("Sync Error:", error);
+    showNoWhisperTip();
   });
 }
 
