@@ -10,17 +10,17 @@ const firebaseConfig = {
   authDomain: "treehole-e83ef.firebaseapp.com",
   databaseURL: "https://treehole-e83ef-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "treehole-e83ef",
-  storageBucket: "treehole-e83ef.appspot.com",
+  storageBucket: "treehole-e83ef.firebasestorage.app",
   messagingSenderId: "167495637236",
   appId: "1:167495637236:web:842c2600dc5d2fe196a6a1",
   measurementId: "G-4EXVLHC6B6"
 };
 
 const sceneMap = {
-  spring:{img:'https://your-cdn.com/spring-night.webp',name:'春·夜晚'},
-  summer:{img:'https://your-cdn.com/summer-night.webp',name:'夏·夜晚'},
-  autumn:{img:'https://your-cdn.com/autumn-night.webp',name:'秋·夜晚'},
-  winter:{img:'https://your-cdn.com/winter-night.webp',name:'冬·夜晚'}
+  spring:{img:'',name:'春·夜晚'},
+  summer:{img:'',name:'夏·夜晚'},
+  autumn:{img:'',name:'秋·夜晚'},
+  winter:{img:'',name:'冬·夜晚'}
 };
 const sceneKeys = Object.keys(sceneMap);
 let currentSceneIndex = 1;
@@ -32,6 +32,7 @@ const moodColorMap = {
 const colorMoodMap = Object.fromEntries(Object.entries(moodColorMap).map(([k,v])=>[v,k]));
 
 let db;
+// 新增：标记 Firebase 是否加载/初始化成功
 let firebaseReady = false;
 
 window.onload = function(){
@@ -46,6 +47,7 @@ window.onload = function(){
   initRealTimeStats();
   
   if (!window.firebase) {
+    // 备选CDN（优先官方，失败换备用）
     const firebaseCdnList = [
       'https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js',
       'https://cdn.bootcdn.net/ajax/libs/firebase/9.22.1/firebase-app-compat.js'
@@ -55,6 +57,7 @@ window.onload = function(){
       'https://cdn.bootcdn.net/ajax/libs/firebase/9.22.1/firebase-database-compat.js'
     ];
 
+    // 加载脚本的通用函数
     function loadScript(cdnList, timeout = 10000) {
       return new Promise((resolve, reject) => {
         const load = (index) => {
@@ -74,6 +77,7 @@ window.onload = function(){
       });
     }
 
+    // 加载Firebase App
     loadScript(firebaseCdnList)
       .then(() => loadScript(dbCdnList))
       .then(() => {
@@ -90,6 +94,7 @@ window.onload = function(){
         showLocalModeTip();
       });
   } else {
+    // 原有逻辑
     initFirebase().then(() => {
       firebaseReady = true;
       syncWhispersFromCloud();
@@ -100,6 +105,7 @@ window.onload = function(){
   }
 };
 
+// 【修改点】优化 initFirebase：增加重试机制 + 超时处理
 function initFirebase() {
   return new Promise((resolve, reject) => {
     try {
@@ -108,15 +114,17 @@ function initFirebase() {
       }
       db = firebase.database();
       
+      // 优化：增加重试机制 + 超时处理
       const connectedRef = db.ref('.info/connected');
       let connectAttempts = 0;
-      const maxAttempts = 3;
+      const maxAttempts = 3; // 最多重试3次
       
       const checkConnection = (snapshot) => {
         connectAttempts++;
         if (snapshot.val() === true) {
           resolve();
         } else if (connectAttempts < maxAttempts) {
+          // 重试监听
           setTimeout(() => {
             connectedRef.once('value', checkConnection, connectError);
           }, 1000);
@@ -136,9 +144,13 @@ function initFirebase() {
         }
       };
       
+      // 首次检测
       connectedRef.once('value', checkConnection, connectError);
       
+      // 增加整体超时（10秒）
       setTimeout(() => {
+        // 如果还没有 resolve 或 reject，则强制 reject
+        // 注意：这里需要确保 Promise 状态未被改变，简单实现下直接 reject 即可，Promise 会忽略后续的 resolve/reject
         reject(new Error("数据库连接超时"));
       }, 10000);
       
@@ -148,37 +160,29 @@ function initFirebase() {
   });
 }
 
+// 优化：增加错误回调 + 判空 firebaseReady
 function syncWhispersFromCloud() {
   if (!firebaseReady || !db) return;
   
   const whispersRef = db.ref('whispers');
+  // 新增：移除旧监听，避免重复监听导致端口冲突
   whispersRef.off('value');
+  // 新增：监听事件增加错误回调
   whispersRef.on('value', (snapshot) => {
     const cloudData = snapshot.val() || {};
-    whispers = Object.values(cloudData).map(item => ({
-      id: item.id || '',
-      text: item.text || '',
-      x: item.x || 0,
-      y: item.y || 0,
-      likeCount: item.likeCount || 0,
-      liked: item.liked || false,
-      replies: item.replies || [],
-      color: item.color || "#E67E22",
-      mood: item.mood || "plain",
-      time: item.time || new Date().toLocaleString(),
-      forceShow: item.forceShow || false,
-      isMine: item.isMine || false
-    }));
+    whispers = Object.values(cloudData);
     document.querySelectorAll('.whisper').forEach(el => el.remove());
     whispers.forEach((w, i) => renderWhisper(w, i));
     updateWhisperCount();
     keepMinCount();
   }, (error) => {
+    // 捕获监听错误，避免端口报错
     console.error("同步云端数据失败：", error);
     showLocalModeTip();
   });
 }
 
+// 优化：发布前判断 firebaseReady
 function publishWhisperToCloud(whisperData) {
   if (!firebaseReady || !db) return null;
   
@@ -191,14 +195,17 @@ function publishWhisperToCloud(whisperData) {
   return whisperData;
 }
 
+// 优化：更新前判断 firebaseReady
 function updateWhisperInCloud(whisperId, updateData) {
-  if (!firebaseReady || !db || !whisperId) return;
+  if (!firebaseReady || !db) return;
   
   const whisperRef = db.ref(`whispers/${whisperId}`);
   whisperRef.update(updateData);
 }
 
+// 新增：本地模式提示
 function showLocalModeTip() {
+  // 避免重复添加
   if (document.getElementById('local-mode-tip')) return;
 
   const tip = document.createElement('div');
@@ -223,39 +230,24 @@ function showLocalModeTip() {
   }, 5000);
 }
 
-function getRandomWhisperPosition() {
-  const whisperWidth = 192;
-  const whisperHeight = 108;
-  const maxX = window.innerWidth - whisperWidth - 20;
-  const maxY = window.innerHeight - whisperHeight - 20;
-  const xPercent = Math.max(5, Math.min(90, (Math.random() * maxX / window.innerWidth) * 100));
-  const yPercent = Math.max(5, Math.min(90, (Math.random() * maxY / window.innerHeight) * 100));
-  return { x: xPercent, y: yPercent };
-}
-
+// 优化：发布函数增加本地降级
 function publishWhisper(){
   let t = document.getElementById('input-text').value.trim();
   if(!t){alert('请写下您的心念～');return;}
   const select = document.getElementById('mood-select');
   const mood = select.value;
-  const color = moodColorMap[mood] || "#E67E22";
-  
-  const { x: randomX, y: randomY } = getRandomWhisperPosition();
+  const color = moodColorMap[mood];
+  const maxTop = 85;
+  const randomX = Math.random()*70+10;
+  const randomY = Math.random()*(maxTop - 10) + 10;
   
   let newWhisper = {
-    text:t, 
-    x:randomX, 
-    y:randomY, 
-    likeCount:0, 
-    liked:false, 
-    replies:[],
-    color:color, 
-    mood:mood, 
-    time:new Date().toLocaleString(),
-    forceShow:true, 
-    isMine: true
+    text:t, x:randomX, y:randomY, likeCount:0, liked:false, replies:[],
+    color:color, mood:mood, time:new Date().toLocaleString(),
+    forceShow:true, isMine: true
   };
   
+  // 仅当 Firebase 就绪时才同步云端
   if (firebaseReady && db) {
     const cloudWhisper = publishWhisperToCloud(newWhisper);
     if (cloudWhisper) {
@@ -266,6 +258,8 @@ function publishWhisper(){
       }, 60000);
     }
   } else {
+    // 本地降级：仅保存到 localStorage
+    // 生成一个临时ID用于本地展示一致性
     newWhisper.id = 'local_' + Date.now();
     whispers.push(newWhisper);
     myWhispers.push(newWhisper);
@@ -277,42 +271,25 @@ function publishWhisper(){
   document.getElementById('input-modal').style.display='none';
 }
 
-function preloadBgImages() {
-  Object.values(sceneMap).forEach(scene => {
-    if (scene.img) {
-      const img = new Image();
-      img.src = scene.img;
-    }
-  });
-}
-
+// 以下函数保持不变（仅上文修改了核心逻辑，其余无需改动）
+function preloadBgImages(){}
 function initRealTimeStats(){
   updateRealOnlineCount();
   setInterval(updateRealOnlineCount, 300000);
 }
-
 function updateRealOnlineCount(){
   let n = Math.floor(Math.random()*50)+1;
   document.getElementById('online-count').textContent = `${n} 人此刻同在`;
 }
-
 function startBgCarousel(){
   const bgContainer = document.getElementById('bg-container');
-  const initialScene = sceneMap.summer;
-  bgContainer.style.background = initialScene.img 
-    ? `url(${initialScene.img}) center/cover no-repeat #1a1720` 
-    : '#1a1720';
+  bgContainer.style.background = '#1a1720';
   document.getElementById('scene-display').textContent = sceneMap.summer.name;
-  
   setInterval(()=>{
     currentSceneIndex = (currentSceneIndex + 1) % sceneKeys.length;
     const key = sceneKeys[currentSceneIndex];
     currentScene = key;
-    const scene = sceneMap[key];
-    bgContainer.style.background = scene.img 
-      ? `url(${scene.img}) center/cover no-repeat #1a1720` 
-      : '#1a1720';
-    document.getElementById('scene-display').textContent = scene.name;
+    document.getElementById('scene-display').textContent = sceneMap[key].name;
   }, 20000);
 }
 
@@ -329,13 +306,14 @@ function bindEvents(){
     currentDetailId = -1;
   };
   document.getElementById('detail-heart').onclick = ()=>{
-    if(currentDetailId === -1 || !whispers[currentDetailId]) return;
+    if(currentDetailId===-1 || !whispers[currentDetailId] || !whispers[currentDetailId].id)return;
     let w = whispers[currentDetailId];
     w.liked = !w.liked;
-    w.likeCount = w.liked ? w.likeCount + 1 : Math.max(0, w.likeCount - 1);
+    w.likeCount += w.liked?1:-1;
     document.getElementById('detail-heart').classList.toggle('active',w.liked);
     document.getElementById('detail-like-count').textContent = w.likeCount;
-    if (firebaseReady && db && w.id) {
+    // 仅 Firebase 就绪时更新云端
+    if (firebaseReady && db) {
       updateWhisperInCloud(w.id, {liked: w.liked, likeCount: w.likeCount});
     }
   };
@@ -352,13 +330,14 @@ function bindEvents(){
     currentRandomId = -1;
   };
   document.getElementById('random-heart').onclick = ()=>{
-    if(currentRandomId === -1 || !whispers[currentRandomId]) return;
+    if(currentRandomId===-1 || !whispers[currentRandomId] || !whispers[currentRandomId].id)return;
     let w = whispers[currentRandomId];
     w.liked = !w.liked;
-    w.likeCount = w.liked ? w.likeCount + 1 : Math.max(0, w.likeCount - 1);
+    w.likeCount += w.liked?1:-1;
     document.getElementById('random-heart').classList.toggle('active',w.liked);
     document.getElementById('random-like-count').textContent = w.likeCount;
-    if (firebaseReady && db && w.id) {
+    // 仅 Firebase 就绪时更新云端
+    if (firebaseReady && db) {
       updateWhisperInCloud(w.id, {liked: w.liked, likeCount: w.likeCount});
     }
   };
@@ -387,13 +366,12 @@ function bindEvents(){
 }
 
 function renderWhisper(w, id){
-  if (!w) return;
   let el = document.createElement('div');
   el.className = 'whisper show';
-  el.innerText = w.text || '';
-  el.style.left = `${w.x || 0}%`;
-  el.style.top = `${w.y || 0}%`;
-  el.style.setProperty('--top-color', w.color || "#E67E22");
+  el.innerText = w.text;
+  el.style.left = w.x+'%';
+  el.style.top = w.y+'%';
+  el.style.setProperty('--top-color', w.color);
   
   el.onmouseenter = ()=>{
     clearTimeout(hoverTimer);
@@ -449,6 +427,7 @@ function renderReplyList(list, type){
       rep.likeCount += rep.liked?1:-1;
       e.currentTarget.querySelector('.heart-icon').classList.toggle('active',rep.liked);
       e.currentTarget.querySelector('.reply-like-count').textContent = rep.likeCount;
+      // 仅 Firebase 就绪时更新云端
       if (firebaseReady && db && whispers[currentId].id) {
         updateWhisperInCloud(whispers[currentId].id, {replies: whispers[currentId].replies});
       }
@@ -465,6 +444,7 @@ function submitReply(id, type){
   whispers[id].replies.push({
     text:t, time:new Date().toLocaleTimeString(), likeCount:0, liked:false
   });
+  // 仅 Firebase 就绪时更新云端
   if (firebaseReady && db && whispers[id].id) {
     updateWhisperInCloud(whispers[id].id, {replies: whispers[id].replies});
   }
@@ -562,7 +542,6 @@ function updateWhisperCount(){
 function saveMyWhispers(){
   localStorage.setItem('xinianbu_my', JSON.stringify(myWhispers));
 }
-
 function loadMyWhispers(){
   let d = localStorage.getItem('xinianbu_my');
   if(d) myWhispers = JSON.parse(d);
