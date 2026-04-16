@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TiedStory - 絮语树洞</title>
+  <title>心念簿 - 絮语树洞</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- 顶部左侧logo和标语 -->
+  <!-- 顶部左侧logo和标语（修改为心念簿） -->
   <div class="header-left">
-    <h1>TiedStory</h1>
-    <p>每一条絮语，都是你认真生活的证明</p>
+    <h1>心念簿</h1>
+    <p>每一个起心动念，都是你认真生活的证明</p>
     <div class="stats">
       <span>共 <span id="whisper-count">0</span> 条絮语</span>
       <button class="random-btn">随机遇见</button>
@@ -18,14 +18,13 @@
     </div>
   </div>
 
-  <!-- 顶部右侧：真实到访数、在线数、场景 -->
+  <!-- 顶部右侧：仅保留此刻同在（去掉到访人数） -->
   <div class="header-right">
-    <span id="visit-count">0 人到访过</span>
-    <span id="online-count">0 人在线</span>
+    <span id="online-count">0 人此刻同在</span>
     <div class="scene-display" id="scene-display">夏·夜晚</div>
   </div>
 
-  <!-- 右下角功能区（改“系上一条”为“心心絮语”） -->
+  <!-- 右下角功能区（心心絮语） -->
   <div class="footer-right">
     <button class="my-whisper-btn">我的絮语</button>
     <button class="publish-btn">+ 心心絮语</button>
@@ -37,8 +36,10 @@
     <button class="submit-btn" id="submit-btn">发布</button>
   </div>
 
-  <!-- 絮语详情弹窗（评论+点赞，默认隐藏） -->
+  <!-- 絮语详情弹窗（评论+点赞，新增关闭按钮） -->
   <div class="detail-modal" id="detail-modal">
+    <!-- 关闭按钮 -->
+    <button class="close-btn" id="close-btn">×</button>
     <!-- 主絮语内容 -->
     <div class="detail-main">
       <p id="detail-content">想要构建体系，让体系去自然而然的流动和发生，人去跟太累了。</p>

@@ -6,17 +6,15 @@
   font-family: "Microsoft YaHei", sans-serif;
 }
 
-/* 修复背景切换白闪：新增伪元素承载背景，预加载+无缝过渡 */
+/* 修复背景切换白闪：伪元素承载背景 */
 body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
   position: relative;
-  /* 主背景设为透明，用伪元素显示 */
   background: transparent;
 }
 
-/* 伪元素承载背景图，实现无闪切换 */
 body::before {
   content: "";
   position: absolute;
@@ -24,54 +22,72 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  /* 默认背景 */
   background: url('bg-summer.jpg') no-repeat center center;
   background-size: cover;
-  /* 关键：过渡时间1.5s，无闪 */
   transition: background-image 1.5s ease-in-out;
-  /* 层级最低，不遮挡内容 */
   z-index: -1;
-  /* 预加载背景图（核心：解决白闪） */
   image-rendering: optimizeQuality;
 }
 
-/* 絮语样式 */
+/* 絮语样式（便签设计：随机颜色、图片上方、半透模糊/hover变实） */
 .whisper {
   position: absolute;
-  padding: 10px 15px;
-  background: rgba(0, 0, 0, 0.7);
+  padding: 12px 18px;
+  /* 半透模糊底 + 时隐时现 */
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
   color: #fff;
-  border-radius: 2px;
+  border-radius: 4px;
   font-size: 14px;
-  max-width: 200px;
+  max-width: 220px;
   word-wrap: break-word;
   cursor: pointer;
   transform: rotate(calc(var(--rotate) * 1deg));
-  transition: all 0.3s ease;
-  border-left: 3px solid #4CAF50;
+  transition: all 0.4s ease;
+  /* 绿色左侧边改为随机色边框 */
+  border: 2px solid var(--bg-color);
+  /* 定位到图片上方区域 */
+  top: calc(var(--y) * 0.7%); 
+  left: calc(var(--x) * 1%);
+  /* 时隐时现动画 */
+  animation: fadeInOut 8s infinite alternate;
+  z-index: 10;
 }
 
+/* 时隐时现动画 */
+@keyframes fadeInOut {
+  0% { opacity: 0.4; }
+  100% { opacity: 0.8; }
+}
+
+/* hover时底色变实 */
 .whisper:hover {
-  background: rgba(0, 0, 0, 0.9);
-  transform: rotate(calc(var(--rotate) * 1deg)) scale(1.05);
+  background: rgba(255, 255, 255, 0.85);
+  color: #333;
+  backdrop-filter: blur(2px);
+  transform: rotate(calc(var(--rotate) * 1deg)) scale(1.08);
+  opacity: 1 !important;
+  animation: none;
 }
 
-/* 顶部左侧logo区域 */
+/* 顶部左侧logo区域（心念簿） */
 .header-left {
   position: absolute;
   top: 20px;
   left: 20px;
   color: #fff;
   text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  z-index: 20;
 }
 
 .header-left h1 {
-  font-size: 28px;
+  font-size: 32px;
   margin-bottom: 5px;
+  font-weight: bold;
 }
 
 .header-left p {
-  font-size: 14px;
+  font-size: 15px;
   margin-bottom: 10px;
   opacity: 0.9;
 }
@@ -91,7 +107,7 @@ body::before {
   cursor: pointer;
 }
 
-/* 顶部右侧：到访数、在线数、场景 */
+/* 顶部右侧：此刻同在 + 场景 */
 .header-right {
   position: absolute;
   top: 20px;
@@ -100,6 +116,7 @@ body::before {
   gap: 15px;
   color: #fff;
   text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  z-index: 20;
 }
 
 .header-right span, #scene-display {
@@ -109,7 +126,7 @@ body::before {
   font-size: 12px;
 }
 
-/* 右下角功能按钮（改“心心絮语”样式） */
+/* 右下角功能按钮 */
 .footer-right {
   position: absolute;
   bottom: 20px;
@@ -118,6 +135,7 @@ body::before {
   flex-direction: column;
   gap: 10px;
   align-items: flex-end;
+  z-index: 20;
 }
 
 .my-whisper-btn {
@@ -151,7 +169,7 @@ body::before {
   padding: 20px;
   border-radius: 8px;
   display: none;
-  z-index: 999;
+  z-index: 100;
 }
 
 .input-text {
@@ -174,7 +192,7 @@ body::before {
   cursor: pointer;
 }
 
-/* 絮语详情弹窗（核心：评论+点赞） */
+/* 絮语详情弹窗（新增关闭按钮） */
 .detail-modal {
   position: fixed;
   top: 50%;
@@ -186,7 +204,27 @@ body::before {
   width: 450px;
   color: #fff;
   display: none;
-  z-index: 999;
+  z-index: 100;
+}
+
+/* 关闭按钮样式 */
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: transparent;
+  color: #fff;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+}
+
+.close-btn:hover {
+  color: #ff4444;
 }
 
 /* 主絮语内容 */
@@ -194,6 +232,7 @@ body::before {
   margin-bottom: 20px;
   padding-bottom: 15px;
   border-bottom: 1px solid rgba(255,255,255,0.2);
+  margin-top: 10px;
 }
 
 .detail-main #detail-content {
