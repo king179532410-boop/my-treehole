@@ -46,10 +46,12 @@ window.onload = function(){
   
   if (!window.firebase) {
     const script = document.createElement('script');
-    script.src = 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
+    // 【修改点】使用 compat 版本以支持全局 firebase 变量
+    script.src = 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js';
     script.onload = () => {
       const dbScript = document.createElement('script');
-      dbScript.src = 'https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js';
+      // 【修改点】使用 compat 版本
+      dbScript.src = 'https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js';
       dbScript.onload = initFirebase;
       document.head.appendChild(dbScript);
     };
