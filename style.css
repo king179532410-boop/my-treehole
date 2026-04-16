@@ -1,4 +1,4 @@
-/* 全局样式 */
+/* 全局样式重置 */
 * {
   margin: 0;
   padding: 0;
@@ -6,7 +6,7 @@
   font-family: "Microsoft YaHei", sans-serif;
 }
 
-/* 修复背景切换白闪：伪元素承载背景 */
+/* 背景无白闪：伪元素承载背景 */
 body {
   width: 100vw;
   height: 100vh;
@@ -29,48 +29,67 @@ body::before {
   image-rendering: optimizeQuality;
 }
 
-/* 絮语样式（便签设计：随机颜色、图片上方、半透模糊/hover变实） */
+/* ==================== 絮语核心样式（完全匹配需求） ==================== */
+/* 絮语容器：四边圆角、仅顶部彩色条、三状态控制 */
 .whisper {
   position: absolute;
-  padding: 12px 18px;
-  /* 半透模糊底 + 时隐时现 */
-  background: rgba(255, 255, 255, 0.15);
+  padding: 16px 18px 12px;
+  /* 初始完全隐藏 */
+  opacity: 0;
+  pointer-events: none;
+  /* 半透状态样式 */
+  background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(8px);
   color: #fff;
-  border-radius: 4px;
-  font-size: 14px;
-  max-width: 220px;
+  /* 四边圆角 */
+  border-radius: 10px;
+  font-size: 15px;
+  max-width: 240px;
   word-wrap: break-word;
   cursor: pointer;
   transform: rotate(calc(var(--rotate) * 1deg));
   transition: all 0.4s ease;
-  /* 绿色左侧边改为随机色边框 */
-  border: 2px solid var(--bg-color);
-  /* 定位到图片上方区域 */
-  top: calc(var(--y) * 0.7%); 
-  left: calc(var(--x) * 1%);
-  /* 时隐时现动画 */
-  animation: fadeInOut 8s infinite alternate;
+  /* 顶部彩色条：伪元素实现 */
+  position: relative;
+  overflow: hidden;
   z-index: 10;
 }
 
-/* 时隐时现动画 */
-@keyframes fadeInOut {
-  0% { opacity: 0.4; }
-  100% { opacity: 0.8; }
+/* 顶部彩色条（仅顶部，非包边） */
+.whisper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background: var(--mood-color);
+  border-radius: 10px 10px 0 0;
 }
 
-/* hover时底色变实 */
+/* 状态1：完全隐藏 */
+.whisper.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: rotate(calc(var(--rotate) * 1deg)) scale(0.95);
+}
+
+/* 状态2：半透显示（出现时） */
+.whisper.show {
+  opacity: 0.4;
+  pointer-events: auto;
+  transform: rotate(calc(var(--rotate) * 1deg)) scale(1);
+}
+
+/* 状态3：鼠标悬停变实 */
 .whisper:hover {
-  background: rgba(255, 255, 255, 0.85);
-  color: #333;
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(2px);
   transform: rotate(calc(var(--rotate) * 1deg)) scale(1.08);
-  opacity: 1 !important;
-  animation: none;
 }
 
-/* 顶部左侧logo区域（心念簿） */
+/* ==================== 顶部导航栏样式 ==================== */
 .header-left {
   position: absolute;
   top: 20px;
@@ -107,7 +126,6 @@ body::before {
   cursor: pointer;
 }
 
-/* 顶部右侧：此刻同在 + 场景 */
 .header-right {
   position: absolute;
   top: 20px;
@@ -126,7 +144,7 @@ body::before {
   font-size: 12px;
 }
 
-/* 右下角功能按钮 */
+/* ==================== 右下角按钮样式 ==================== */
 .footer-right {
   position: absolute;
   bottom: 20px;
@@ -149,7 +167,7 @@ body::before {
 }
 
 .publish-btn {
-  background: #e6b800;
+  background: #d4a554;
   color: #fff;
   border: none;
   padding: 12px 24px;
@@ -159,55 +177,22 @@ body::before {
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-/* 发布弹窗样式 */
+/* ==================== 发布弹窗样式（匹配图2） ==================== */
 .input-modal {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(0,0,0,0.8);
-  padding: 20px;
-  border-radius: 8px;
+  background: rgba(20, 18, 22, 0.95);
+  padding: 30px;
+  border-radius: 12px;
   display: none;
   z-index: 100;
-}
-
-.input-text {
-  width: 300px;
-  height: 120px;
-  padding: 10px;
-  background: rgba(255,255,255,0.9);
-  border: none;
-  border-radius: 4px;
-  margin-bottom: 10px;
-  resize: none;
-}
-
-.submit-btn {
-  background: #e6b800;
+  width: 550px;
   color: #fff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
 }
 
-/* 絮语详情弹窗（新增关闭按钮） */
-.detail-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(0,0,0,0.9);
-  padding: 25px;
-  border-radius: 8px;
-  width: 450px;
-  color: #fff;
-  display: none;
-  z-index: 100;
-}
-
-/* 关闭按钮样式 */
+/* 弹窗关闭按钮 */
 .close-btn {
   position: absolute;
   top: 15px;
@@ -215,30 +200,110 @@ body::before {
   background: transparent;
   color: #fff;
   border: none;
-  font-size: 20px;
+  font-size: 24px;
   cursor: pointer;
   width: 30px;
   height: 30px;
   line-height: 30px;
   text-align: center;
+  opacity: 0.7;
 }
 
 .close-btn:hover {
-  color: #ff4444;
+  opacity: 1;
+  color: #d4a554;
 }
 
-/* 主絮语内容 */
+.input-header h2 {
+  font-size: 24px;
+  margin-bottom: 8px;
+  color: #f0e6d6;
+}
+
+.input-header p {
+  font-size: 14px;
+  color: #a8a29a;
+  margin-bottom: 20px;
+}
+
+/* 心情选择栏 */
+.mood-select {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.mood-select span {
+  font-size: 14px;
+  color: #a8a29a;
+}
+
+.mood-select label {
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mood-select input {
+  margin-right: 4px;
+}
+
+.input-text {
+  width: 100%;
+  height: 180px;
+  padding: 15px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(212, 165, 84, 0.3);
+  border-radius: 8px;
+  margin-bottom: 20px;
+  resize: none;
+  font-size: 16px;
+  color: #fff;
+}
+
+.input-text::placeholder {
+  color: #666;
+}
+
+.submit-btn {
+  background: #d4a554;
+  color: #fff;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  float: right;
+}
+
+/* ==================== 详情弹窗样式 ==================== */
+.detail-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(20, 18, 22, 0.95);
+  padding: 30px;
+  border-radius: 12px;
+  width: 500px;
+  color: #fff;
+  display: none;
+  z-index: 100;
+}
+
 .detail-main {
   margin-bottom: 20px;
   padding-bottom: 15px;
-  border-bottom: 1px solid rgba(255,255,255,0.2);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
   margin-top: 10px;
 }
 
 .detail-main #detail-content {
-  font-size: 16px;
-  line-height: 1.6;
-  margin-bottom: 10px;
+  font-size: 17px;
+  line-height: 1.7;
+  margin-bottom: 12px;
 }
 
 .detail-meta {
@@ -246,8 +311,7 @@ body::before {
   justify-content: space-between;
   align-items: center;
   font-size: 14px;
-  color: #ccc;
-  margin-bottom: 8px;
+  color: #a8a29a;
 }
 
 .detail-like {
@@ -267,13 +331,6 @@ body::before {
   transform: scale(1.1);
 }
 
-.detail-tip {
-  font-size: 13px;
-  color: #999;
-  font-style: italic;
-}
-
-/* 评论列表 */
 .reply-list {
   max-height: 200px;
   overflow-y: auto;
@@ -283,11 +340,10 @@ body::before {
   gap: 10px;
 }
 
-/* 单条评论样式 */
 .reply-item {
   padding: 10px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 4px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 6px;
 }
 
 .reply-content {
@@ -299,7 +355,7 @@ body::before {
   display: flex;
   justify-content: space-between;
   font-size: 12px;
-  color: #ccc;
+  color: #a8a29a;
 }
 
 .reply-like {
@@ -309,39 +365,29 @@ body::before {
   cursor: pointer;
 }
 
-/* 评论输入框 */
 .reply-input-area {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 .reply-input {
   width: 100%;
   height: 80px;
   padding: 10px;
-  background: rgba(255,255,255,0.9);
-  border: none;
-  border-radius: 4px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(212, 165, 84, 0.3);
+  border-radius: 6px;
   margin-bottom: 10px;
   resize: none;
   font-size: 14px;
+  color: #fff;
 }
 
 .reply-submit-btn {
-  background: #e6b800;
+  background: #d4a554;
   color: #fff;
   border: none;
   padding: 8px 16px;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   float: right;
-}
-
-/* 作者追加内容 */
-.author-add {
-  font-size: 12px;
-  color: #ccc;
-}
-
-.author-add input {
-  margin-right: 5px;
 }
