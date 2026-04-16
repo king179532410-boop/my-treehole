@@ -6,7 +6,7 @@
   font-family: "Microsoft YaHei", sans-serif;
 }
 
-/* 背景容器：核心是多图切换 + 渐变过渡 */
+/* 背景容器：核心是自动随机切换 + 渐变过渡 */
 body {
   width: 100vw;
   height: 100vh;
@@ -19,8 +19,8 @@ body {
   transition: background 1.5s ease-in-out;
 }
 
-/* 丝带样式（原站深色半透明） */
-.ribbon {
+/* 絮语样式（原站深色半透明） */
+.whisper {
   position: absolute;
   padding: 10px 15px;
   background: rgba(0, 0, 0, 0.7);
@@ -35,7 +35,7 @@ body {
   border-left: 3px solid #4CAF50;
 }
 
-.ribbon:hover {
+.whisper:hover {
   background: rgba(0, 0, 0, 0.9);
   transform: rotate(calc(var(--rotate) * 1deg)) scale(1.05);
 }
@@ -75,7 +75,7 @@ body {
   cursor: pointer;
 }
 
-/* 顶部右侧：访问数、在线数、场景、语言 */
+/* 顶部右侧：到访数、在线数、场景显示 */
 .header-right {
   position: absolute;
   top: 20px;
@@ -86,12 +86,11 @@ body {
   text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
-.header-right span, #scene-btn, #lang-btn {
+.header-right span, #scene-display {
   background: rgba(0,0,0,0.5);
   padding: 5px 10px;
   border-radius: 4px;
   font-size: 12px;
-  cursor: pointer;
 }
 
 /* 右下角功能按钮 */
@@ -105,7 +104,7 @@ body {
   align-items: flex-end;
 }
 
-.my-ribbon-btn, .code-btn {
+.my-whisper-btn {
   background: rgba(0,0,0,0.5);
   color: #fff;
   border: none;
@@ -156,28 +155,5 @@ body {
   border: none;
   padding: 8px 16px;
   border-radius: 4px;
-  cursor: pointer;
-}
-
-/* 语言/场景切换弹窗 */
-.lang-modal, .scene-modal {
-  position: absolute;
-  top: 50px;
-  right: 0;
-  background: rgba(0,0,0,0.8);
-  padding: 10px;
-  border-radius: 4px;
-  display: none;
-  flex-direction: column;
-  gap: 5px;
-  z-index: 998;
-}
-
-.lang-item, .scene-item {
-  background: rgba(255,255,255,0.9);
-  color: #333;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 2px;
   cursor: pointer;
 }

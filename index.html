@@ -3,33 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TiedStory - 丝带树洞</title>
+  <title>TiedStory - 絮语树洞</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <!-- 顶部左侧logo和标语 -->
   <div class="header-left">
     <h1>TiedStory</h1>
-    <p>每一条丝带，都是你认真生活的证明</p>
+    <p>每一条絮语，都是你认真生活的证明</p>
     <div class="stats">
-      <span>共 <span id="ribbon-count">0</span> 条丝带</span>
+      <span>共 <span id="whisper-count">0</span> 条絮语</span>
       <button class="random-btn">随机遇见</button>
       <button class="all-btn">查看全部</button>
     </div>
   </div>
 
-  <!-- 顶部右侧：访问数、在线数、场景、语言 -->
+  <!-- 顶部右侧：到访数、在线数、场景（仅显示，不手动切换） -->
   <div class="header-right">
-    <span id="visit-count">808 人到访过</span>
-    <span id="online-count">77 人在线</span>
-    <div class="scene-selector" id="scene-btn">夏·夜晚</div>
-    <div class="lang-selector" id="lang-btn">CN</div>
+    <span id="visit-count">0 人到访过</span>
+    <span id="online-count">0 人在线</span>
+    <div class="scene-display" id="scene-display">夏·夜晚</div>
   </div>
 
-  <!-- 右下角功能区 -->
+  <!-- 右下角功能区（删凭码查看） -->
   <div class="footer-right">
-    <button class="my-ribbon-btn">我的丝带</button>
-    <button class="code-btn">凭码查看</button>
+    <button class="my-whisper-btn">我的絮语</button>
     <button class="publish-btn">+ 系上一条</button>
   </div>
 
@@ -37,20 +35,6 @@
   <div class="input-modal" id="input-modal">
     <textarea class="input-text" id="input-text" placeholder="写下你的心里话吧～"></textarea>
     <button class="submit-btn" id="submit-btn">发布</button>
-  </div>
-
-  <!-- 语言切换弹窗（默认隐藏） -->
-  <div class="lang-modal" id="lang-modal">
-    <button class="lang-item" data-lang="cn">中文</button>
-    <button class="lang-item" data-lang="en">English</button>
-  </div>
-
-  <!-- 场景切换弹窗（默认隐藏） -->
-  <div class="scene-modal" id="scene-modal">
-    <button class="scene-item" data-scene="spring">春·夜晚</button>
-    <button class="scene-item" data-scene="summer">夏·夜晚</button>
-    <button class="scene-item" data-scene="autumn">秋·夜晚</button>
-    <button class="scene-item" data-scene="winter">冬·夜晚</button>
   </div>
 
   <script src="script.js"></script>
