@@ -47,24 +47,40 @@ window.onload = function(){
   initRealTimeStats();
   
   if (!window.firebase) {
-    const script = document.createElement('script');
-    script.src = 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js';
-    // 新增：脚本加载超时/失败处理
-    script.timeout = 10000; // 10秒超时
-    script.onerror = () => {
-      console.warn("Firebase App 脚本加载失败，进入本地模式");
-      showLocalModeTip();
-    };
-    script.onload = () => {
-      const dbScript = document.createElement('script');
-      dbScript.src = 'https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js';
-      // 新增：数据库脚本加载失败处理
-      dbScript.onerror = () => {
-        console.warn("Firebase DB 脚本加载失败，进入本地模式");
-        showLocalModeTip();
-      };
-      dbScript.onload = () => {
-        // 初始化并处理成功/失败
+    // 备选CDN（优先官方，失败换备用）
+    const firebaseCdnList = [
+      'https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js',
+      'https://cdn.bootcdn.net/ajax/libs/firebase/9.22.1/firebase-app-compat.js'
+    ];
+    const dbCdnList = [
+      'https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js',
+      'https://cdn.bootcdn.net/ajax/libs/firebase/9.22.1/firebase-database-compat.js'
+    ];
+
+    // 加载脚本的通用函数
+    function loadScript(cdnList, timeout = 10000) {
+      return new Promise((resolve, reject) => {
+        const load = (index) => {
+          if (index >= cdnList.length) {
+            reject(new Error("所有CDN加载失败"));
+            return;
+          }
+          const script = document.createElement('script');
+          script.src = cdnList[index];
+          script.timeout = timeout;
+          script.onload = () => resolve(script);
+          script.onerror = () => load(index + 1);
+          script.ontimeout = () => load(index + 1);
+          document.head.appendChild(script);
+        };
+        load(0);
+      });
+    }
+
+    // 加载Firebase App
+    loadScript(firebaseCdnList)
+      .then(() => loadScript(dbCdnList))
+      .then(() => {
         initFirebase().then(() => {
           firebaseReady = true;
           syncWhispersFromCloud();
@@ -72,11 +88,13 @@ window.onload = function(){
           console.error("Firebase 初始化失败：", err);
           showLocalModeTip();
         });
-      };
-      document.head.appendChild(dbScript);
-    };
-    document.head.appendChild(script);
+      })
+      .catch(err => {
+        console.warn("Firebase 脚本加载失败：", err);
+        showLocalModeTip();
+      });
   } else {
+    // 原有逻辑
     initFirebase().then(() => {
       firebaseReady = true;
       syncWhispersFromCloud();
@@ -87,7 +105,7 @@ window.onload = function(){
   }
 };
 
-// 重构：增加错误捕获，返回可reject的Promise
+// 【修改点】优化 initFirebase：增加重试机制 + 超时处理
 function initFirebase() {
   return new Promise((resolve, reject) => {
     try {
@@ -95,19 +113,49 @@ function initFirebase() {
         firebase.initializeApp(firebaseConfig);
       }
       db = firebase.database();
-      // 验证数据库连接状态
+      
+      // 优化：增加重试机制 + 超时处理
       const connectedRef = db.ref('.info/connected');
-      connectedRef.once('value', (snapshot) => {
+      let connectAttempts = 0;
+      const maxAttempts = 3; // 最多重试3次
+      
+      const checkConnection = (snapshot) => {
+        connectAttempts++;
         if (snapshot.val() === true) {
           resolve();
+        } else if (connectAttempts < maxAttempts) {
+          // 重试监听
+          setTimeout(() => {
+            connectedRef.once('value', checkConnection, connectError);
+          }, 1000);
         } else {
-          reject(new Error("数据库连接失败"));
+          reject(new Error("数据库连接失败（多次重试后仍未成功）"));
         }
-      }, (err) => {
-        reject(err);
-      });
+      };
+      
+      const connectError = (err) => {
+        if (connectAttempts < maxAttempts) {
+          connectAttempts++;
+          setTimeout(() => {
+            connectedRef.once('value', checkConnection, connectError);
+          }, 1000);
+        } else {
+          reject(err);
+        }
+      };
+      
+      // 首次检测
+      connectedRef.once('value', checkConnection, connectError);
+      
+      // 增加整体超时（10秒）
+      setTimeout(() => {
+        // 如果还没有 resolve 或 reject，则强制 reject
+        // 注意：这里需要确保 Promise 状态未被改变，简单实现下直接 reject 即可，Promise 会忽略后续的 resolve/reject
+        reject(new Error("数据库连接超时"));
+      }, 10000);
+      
     } catch (error) {
-      reject(error); // 捕获初始化异常
+      reject(error);
     }
   });
 }
@@ -157,7 +205,11 @@ function updateWhisperInCloud(whisperId, updateData) {
 
 // 新增：本地模式提示
 function showLocalModeTip() {
+  // 避免重复添加
+  if (document.getElementById('local-mode-tip')) return;
+
   const tip = document.createElement('div');
+  tip.id = 'local-mode-tip';
   tip.style.cssText = `
     position: fixed;
     top: 20px;
@@ -168,11 +220,14 @@ function showLocalModeTip() {
     padding: 8px 16px;
     border-radius: 4px;
     font-size: 12px;
-    z-index: 999;
+    z-index: 9999;
+    pointer-events: none;
   `;
   tip.innerText = "云端服务暂不可用，已进入本地模式（仅本地保存数据）";
   document.body.appendChild(tip);
-  setTimeout(() => tip.remove(), 5000);
+  setTimeout(() => {
+    if(tip.parentNode) tip.parentNode.removeChild(tip);
+  }, 5000);
 }
 
 // 优化：发布函数增加本地降级
@@ -204,6 +259,8 @@ function publishWhisper(){
     }
   } else {
     // 本地降级：仅保存到 localStorage
+    // 生成一个临时ID用于本地展示一致性
+    newWhisper.id = 'local_' + Date.now();
     whispers.push(newWhisper);
     myWhispers.push(newWhisper);
     saveMyWhispers();
@@ -249,7 +306,7 @@ function bindEvents(){
     currentDetailId = -1;
   };
   document.getElementById('detail-heart').onclick = ()=>{
-    if(currentDetailId===-1 || !whispers[currentDetailId].id)return;
+    if(currentDetailId===-1 || !whispers[currentDetailId] || !whispers[currentDetailId].id)return;
     let w = whispers[currentDetailId];
     w.liked = !w.liked;
     w.likeCount += w.liked?1:-1;
@@ -273,7 +330,7 @@ function bindEvents(){
     currentRandomId = -1;
   };
   document.getElementById('random-heart').onclick = ()=>{
-    if(currentRandomId===-1 || !whispers[currentRandomId].id)return;
+    if(currentRandomId===-1 || !whispers[currentRandomId] || !whispers[currentRandomId].id)return;
     let w = whispers[currentRandomId];
     w.liked = !w.liked;
     w.likeCount += w.liked?1:-1;
@@ -330,6 +387,7 @@ function renderWhisper(w, id){
 }
 
 function openWhisperDetail(id){
+  if (id === -1 || !whispers[id]) return;
   currentDetailId = id;
   let w = whispers[id];
   document.getElementById('detail-top-bar').style.background = w.color;
@@ -361,8 +419,10 @@ function renderReplyList(list, type){
     item.querySelector('.reply-like').onclick = (e)=>{
       const rId = parseInt(e.currentTarget.dataset.rid);
       const currentId = type === 'detail' ? currentDetailId : currentRandomId;
-      if(currentId === -1) return;
+      if(currentId === -1 || !whispers[currentId]) return;
       let rep = whispers[currentId].replies[rId];
+      if (!rep) return;
+      
       rep.liked = !rep.liked;
       rep.likeCount += rep.liked?1:-1;
       e.currentTarget.querySelector('.heart-icon').classList.toggle('active',rep.liked);
@@ -377,7 +437,7 @@ function renderReplyList(list, type){
 }
 
 function submitReply(id, type){
-  if(id===-1)return;
+  if(id===-1 || !whispers[id]) return;
   const inputEl = type === 'detail' ? document.getElementById('reply-input') : document.getElementById('random-reply-input');
   let t = inputEl.value.trim();
   if(!t||t.length>50){alert('请输入50字以内的心念～');return;}
