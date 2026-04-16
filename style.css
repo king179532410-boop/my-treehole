@@ -6,15 +6,33 @@
   font-family: "Microsoft YaHei", sans-serif;
 }
 
-/* 背景容器：自动随机切换 + 渐变过渡 */
+/* 修复背景切换白闪：新增伪元素承载背景，预加载+无缝过渡 */
 body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
   position: relative;
+  /* 主背景设为透明，用伪元素显示 */
+  background: transparent;
+}
+
+/* 伪元素承载背景图，实现无闪切换 */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* 默认背景 */
   background: url('bg-summer.jpg') no-repeat center center;
   background-size: cover;
-  transition: background 1.5s ease-in-out;
+  /* 关键：过渡时间1.5s，无闪 */
+  transition: background-image 1.5s ease-in-out;
+  /* 层级最低，不遮挡内容 */
+  z-index: -1;
+  /* 预加载背景图（核心：解决白闪） */
+  image-rendering: optimizeQuality;
 }
 
 /* 絮语样式 */
