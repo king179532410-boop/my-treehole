@@ -7,74 +7,73 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- 顶部左侧logo和标语 -->
-  <div class="header-left">
-    <h1>心念簿</h1>
-    <p>每一个起心动念，都是你认真生活的证明</p>
-    <div class="stats">
-      <span>共 <span id="whisper-count">0</span> 条絮语</span>
-      <button class="random-btn">随机遇见</button>
-      <button class="all-btn">查看全部</button>
-    </div>
+<!-- 顶部标题 -->
+<div class="header-left">
+  <h1>心念簿</h1>
+  <p>每一个起心动念，都是你认真生活的证明</p>
+  <div class="stats">
+    <span>共 <span id="whisper-count">0</span> 条絮语</span>
+    <button class="random-btn">随机遇见</button>
+    <button class="all-btn">查看全部</button>
   </div>
+</div>
 
-  <!-- 顶部右侧：仅保留此刻同在 -->
-  <div class="header-right">
-    <span id="online-count">0 人此刻同在</span>
-    <div class="scene-display" id="scene-display">夏·夜晚</div>
+<!-- 右侧：此刻同在 -->
+<div class="header-right">
+  <span id="online-count">0 人此刻同在</span>
+  <div class="scene-display" id="scene-display">夏·夜晚</div>
+</div>
+
+<!-- 右下角发布 -->
+<div class="footer-right">
+  <button class="my-whisper-btn">我的絮语</button>
+  <button class="publish-btn">+ 心心絮语</button>
+</div>
+
+<!-- 发布弹窗（心情下拉框） -->
+<div class="input-modal" id="input-modal">
+  <button class="close-btn" id="input-close-btn">×</button>
+  <div class="input-header">
+    <h2>此刻，你想说什么？</h2>
+    <p>写下来就好，不需要理由，也不用完整</p>
   </div>
-
-  <!-- 右下角功能区 -->
-  <div class="footer-right">
-    <button class="my-whisper-btn">我的絮语</button>
-    <button class="publish-btn">+ 心心絮语</button>
+  <!-- 心情下拉框 -->
+  <div class="mood-select">
+    <span>此刻你的心念：</span>
+    <select id="mood-select">
+      <option value="愉悦">愉悦</option>
+      <option value="希望">希望</option>
+      <option value="被爱">被爱</option>
+      <option value="怀念">怀念</option>
+      <option value="犹豫">犹豫</option>
+      <option value="平淡">平淡</option>
+      <option value="孤独">孤独</option>
+    </select>
   </div>
+  <textarea class="input-text" id="input-text" placeholder="今天，我……"></textarea>
+  <button class="submit-btn" id="submit-btn">我准备好了</button>
+</div>
 
-  <!-- 发布絮语弹窗（完全匹配图2样式+心情选择+关闭按钮） -->
-  <div class="input-modal" id="input-modal">
-    <!-- 关闭按钮 -->
-    <button class="close-btn" id="input-close-btn">×</button>
-    <div class="input-header">
-      <h2>此刻，你想说什么？</h2>
-      <p>写下来就好，不需要理由，也不用完整</p>
-    </div>
-    <!-- 心情选择栏 -->
-    <div class="mood-select">
-      <span>此刻你的心念：</span>
-      <label><input type="radio" name="mood" value="happy" checked> 😊 开心</label>
-      <label><input type="radio" name="mood" value="sad"> 😔 难过</label>
-      <label><input type="radio" name="mood" value="calm"> 😐 平静</label>
-      <label><input type="radio" name="mood" value="anxious"> 😣 焦虑</label>
-      <label><input type="radio" name="mood" value="love"> 🥰 幸福</label>
-    </div>
-    <!-- 输入框 -->
-    <textarea class="input-text" id="input-text" placeholder="今天，我……"></textarea>
-    <!-- 提交按钮 -->
-    <button class="submit-btn" id="submit-btn">我准备好了</button>
-  </div>
-
-  <!-- 絮语详情弹窗（评论+点赞+关闭按钮） -->
-  <div class="detail-modal" id="detail-modal">
-    <button class="close-btn" id="detail-close-btn">×</button>
-    <div class="detail-main">
-      <p id="detail-content"></p>
-      <div class="detail-meta">
-        <span id="detail-reply-count">回响 · 0</span>
-        <div class="detail-like">
-          <span id="detail-like-count">0</span>
-          <span class="heart-icon" id="detail-heart">❤️</span>
-        </div>
+<!-- 评论详情弹窗 -->
+<div class="detail-modal" id="detail-modal">
+  <button class="close-btn" id="detail-close-btn">×</button>
+  <div class="detail-main">
+    <p id="detail-content"></p>
+    <div class="detail-meta">
+      <span id="detail-reply-count">回响 · 0</span>
+      <div class="detail-like">
+        <span id="detail-like-count">0</span>
+        <span class="heart-icon" id="detail-heart">❤️</span>
       </div>
     </div>
-
-    <div class="reply-list" id="reply-list"></div>
-
-    <div class="reply-input-area">
-      <textarea class="reply-input" id="reply-input" placeholder="写下你的回响（50字以内）…"></textarea>
-      <button class="reply-submit-btn" id="reply-submit-btn">留下回响</button>
-    </div>
   </div>
+  <div class="reply-list" id="reply-list"></div>
+  <div class="reply-input-area">
+    <textarea class="reply-input" id="reply-input" placeholder="写下你的回响（50字以内）…"></textarea>
+    <button class="reply-submit-btn" id="reply-submit-btn">留下回响</button>
+  </div>
+</div>
 
-  <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
