@@ -7,73 +7,111 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<!-- 顶部标题 -->
-<div class="header-left">
-  <h1>心念簿</h1>
-  <p>每一个起心动念，都是你认真生活的证明</p>
-  <div class="stats">
-    <span>共 <span id="whisper-count">0</span> 条絮语</span>
-    <button class="random-btn">随机遇见</button>
-    <button class="all-btn">查看全部</button>
-  </div>
-</div>
-
-<!-- 右侧：此刻同在 -->
-<div class="header-right">
-  <span id="online-count">0 人此刻同在</span>
-  <div class="scene-display" id="scene-display">夏·夜晚</div>
-</div>
-
-<!-- 右下角发布 -->
-<div class="footer-right">
-  <button class="my-whisper-btn">我的絮语</button>
-  <button class="publish-btn">+ 心心絮语</button>
-</div>
-
-<!-- 发布弹窗（下拉心情） -->
-<div class="input-modal" id="input-modal">
-  <button class="close-btn" id="input-close-btn">×</button>
-  <div class="input-header">
-    <h2>此刻，你想说什么？</h2>
-    <p>写下来就好，不需要理由，也不用完整</p>
-  </div>
-  <!-- 心情下拉框 -->
-  <div class="mood-select">
-    <label>此刻你的心念：</label>
-    <select id="mood-select">
-      <option value="joy">愉悦</option>
-      <option value="hope">希望</option>
-      <option value="love">被爱</option>
-      <option value="miss">怀念</option>
-      <option value="hesitate">犹豫</option>
-      <option value="plain">平淡</option>
-      <option value="lonely">孤独</option>
-    </select>
-  </div>
-  <textarea class="input-text" id="input-text" placeholder="今天，我……"></textarea>
-  <button class="submit-btn" id="submit-btn">我准备好了</button>
-</div>
-
-<!-- 详情弹窗 -->
-<div class="detail-modal" id="detail-modal">
-  <button class="close-btn" id="detail-close-btn">×</button>
-  <div class="detail-main">
-    <p id="detail-content"></p>
-    <div class="detail-meta">
-      <span id="detail-reply-count">回响 · 0</span>
-      <div class="detail-like">
-        <span id="detail-like-count">0</span>
-        <span class="heart-icon" id="detail-heart">❤️</span>
-      </div>
+  <!-- 顶部标题区 -->
+  <div class="header-left">
+    <h1>心念簿</h1>
+    <p>每一个起心动念，都是你认真生活的证明</p>
+    <div class="stats">
+      <span>共 <span id="whisper-count">0</span> 条絮语</span>
+      <button class="random-btn">随机遇见</button>
+      <button class="all-btn">查看全部</button>
     </div>
   </div>
-  <div class="reply-list" id="reply-list"></div>
-  <div class="reply-input-area">
-    <textarea class="reply-input" id="reply-input" placeholder="写下你的回响（50字以内）…"></textarea>
-    <button class="reply-submit-btn" id="reply-submit-btn">留下回响</button>
-  </div>
-</div>
 
-<script src="script.js"></script>
+  <!-- 右上角状态 -->
+  <div class="header-right">
+    <span id="online-count">0 人此刻同在</span>
+    <div class="scene-display" id="scene-display">夏·夜晚</div>
+  </div>
+
+  <!-- 右下角功能区 -->
+  <div class="footer-right">
+    <button class="my-whisper-btn">我的絮语</button>
+    <button class="publish-btn">+ 心心絮语</button>
+  </div>
+
+  <!-- 发布弹窗 -->
+  <div class="input-modal" id="input-modal">
+    <button class="close-btn" id="input-close-btn">×</button>
+    <div class="input-header">
+      <h2>此刻，你想说什么？</h2>
+      <p>写下来就好，不需要理由，也不用完整</p>
+    </div>
+    <div class="mood-select">
+      <label>此刻你的心念：</label>
+      <select id="mood-select">
+        <option value="joy">愉悦</option>
+        <option value="hope">希望</option>
+        <option value="love">被爱</option>
+        <option value="miss">怀念</option>
+        <option value="hesitate">犹豫</option>
+        <option value="plain">平淡</option>
+        <option value="lonely">孤独</option>
+      </select>
+    </div>
+    <textarea class="input-text" id="input-text" placeholder="今天，我……"></textarea>
+    <button class="submit-btn" id="submit-btn">我准备好了</button>
+  </div>
+
+  <!-- 详情弹窗（顶部增加同色条） -->
+  <div class="detail-modal" id="detail-modal">
+    <!-- 顶部彩色条 -->
+    <div class="detail-top-bar" id="detail-top-bar"></div>
+    <button class="close-btn" id="detail-close-btn">×</button>
+    <div class="detail-main">
+      <p id="detail-content"></p>
+      <div class="detail-meta">
+        <span id="detail-reply-count">回响 · 0</span>
+        <div class="detail-like">
+          <span id="detail-like-count">0</span>
+          <span class="heart-icon" id="detail-heart">❤️</span>
+        </div>
+      </div>
+    </div>
+    <div class="reply-list" id="reply-list"></div>
+    <div class="reply-input-area">
+      <textarea class="reply-input" id="reply-input" placeholder="写下你的心念（50字以内）…"></textarea>
+      <button class="reply-submit-btn" id="reply-submit-btn">留下您的心念</button>
+    </div>
+  </div>
+
+  <!-- 随机遇见弹窗 -->
+  <div class="random-modal" id="random-modal">
+    <button class="close-btn" id="random-close-btn">×</button>
+    <div class="random-top-bar" id="random-top-bar"></div>
+    <div class="random-content" id="random-content"></div>
+  </div>
+
+  <!-- 全部查看列表（参考图片样式） -->
+  <div class="all-list-modal" id="all-list-modal">
+    <button class="close-btn" id="all-close-btn">×</button>
+    <div class="all-header">
+      <span>全部心念</span>
+      <div class="color-tags">
+        <span class="all-tag active">全部</span>
+        <span class="color-tag" style="background:#FF5E7D;"></span>
+        <span class="color-tag" style="background:#7B61FF;"></span>
+        <span class="color-tag" style="background:#4CC9FF;"></span>
+        <span class="color-tag" style="background:#2ECC71;"></span>
+        <span class="color-tag" style="background:#F1C40F;"></span>
+        <span class="color-tag" style="background:#E67E22;"></span>
+        <span class="color-tag" style="background:#9B59B6;"></span>
+        <span class="color-tag" style="background:#1ABC9C;"></span>
+        <span class="color-tag" style="background:#3498DB;"></span>
+      </div>
+    </div>
+    <div class="all-list-content" id="all-list-content"></div>
+  </div>
+
+  <!-- 我的絮语列表 -->
+  <div class="my-list-modal" id="my-list-modal">
+    <button class="close-btn" id="my-close-btn">×</button>
+    <div class="my-header">
+      <span>我的心念</span>
+    </div>
+    <div class="my-list-content" id="my-list-content"></div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
