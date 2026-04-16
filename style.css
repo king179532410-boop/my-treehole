@@ -2,92 +2,72 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "SimSun", 宋体, sans-serif; /* 全局宋体 */
+  font-family: "SimSun", 宋体, sans-serif;
 }
-
 body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
   position: relative;
-  background: #000; /* 兜底背景 */
+  background: #1a1720; /* 改用纯色背景，去掉404 */
 }
-
-/* 背景20秒轮播（修复伪元素优先级+路径兼容） */
 #bg-container {
   position: absolute;
   top: 0; left: 0;
   width: 100%; height: 100%;
-  background: url('bg-summer.jpg') no-repeat center center;
-  background-size: cover;
-  transition: background-image 1.5s ease-in-out;
+  background: #1a1720;
+  transition: all 1.5s ease-in-out;
   z-index: -1;
   opacity: 0.95;
 }
-
-/* ==================== 核心：60%尺寸便签（防底部遮挡） ==================== */
 .whisper {
   position: absolute;
-  /* 缩至原尺寸60%：320×180 → 192×108 */
   width: 192px;
   min-height: 108px;
   padding: 12px 12px 9px;
   border-radius: 12px;
-  font-size: 14px; /* 字体同步缩小 */
+  font-size: 14px;
   word-wrap: break-word;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
   z-index: 10;
-  transform: none !important; /* 无倾斜 */
-  /* 米色字体，非纯白 */
+  transform: none !important;
   color: #F5F0E1;
-  line-height: 1.6; /* 行高优化 */
-  /* 限制位置：底部留足够空间，确保完全显示 */
+  line-height: 1.6;
   max-top: calc(100vh - 130px) !important;
 }
-
-/* 顶部彩色条（默认8px，hover加粗到11px） */
 .whisper::before {
   content: "";
   position: absolute;
   top: 0; left: 0;
   width: 100%; 
-  height: 8px; /* 默认高度 */
+  height: 8px;
   background: var(--top-color);
   border-radius: 12px 12px 0 0;
-  transition: height 0.3s ease; /* 动画过渡 */
+  transition: height 0.3s ease;
 }
-
-/* 完全隐藏 */
 .whisper.hidden { 
   opacity: 0; 
   pointer-events: none; 
 }
-
-/* 半透显示 */
 .whisper.show {
   opacity: 0.4;
   background: rgba(0,0,0,0.3);
   backdrop-filter: blur(8px);
   pointer-events: auto;
 }
-
-/* 鼠标悬停：上浮+色条加粗+变实 */
 .whisper.hover {
   opacity: 1;
   background: rgba(0,0,0,0.85);
   backdrop-filter: blur(2px);
-  transform: translateY(-8px) !important; /* 轻微上浮 */
-  box-shadow: 0 8px 20px rgba(0,0,0,0.4); /* 增强上浮感 */
+  transform: translateY(-8px) !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
 }
-/* hover时顶部色条加粗3px（8→11） */
 .whisper.hover::before {
   height: 11px;
 }
-
-/* ==================== 顶部导航样式 ==================== */
 .header-left {
   position: absolute; top:20px; left:20px;
   color:#F5F0E1; text-shadow:0 2px 4px rgba(0,0,0,0.5);
@@ -99,7 +79,6 @@ body {
   background:rgba(0,0,0,0.5); padding:5px 10px; border-radius:4px;
   font-size:12px; border:none; color:#F5F0E1; cursor:pointer;
 }
-
 .header-right {
   position: absolute; top:20px; right:20px;
   display:flex; gap:15px; color:#F5F0E1; text-shadow:0 2px 4px rgba(0,0,0,0.5);
@@ -108,8 +87,6 @@ body {
 .header-right span,#scene-display {
   background:rgba(0,0,0,0.5); padding:5px 10px; border-radius:4px; font-size:12px;
 }
-
-/* ==================== 右下角按钮 ==================== */
 .footer-right {
   position: absolute; bottom:20px; right:20px;
   display:flex; flex-direction:column; gap:10px; align-items:flex-end;
@@ -123,8 +100,6 @@ body {
   background:#d4a554; color:#F5F0E1; border:none;
   padding:12px 24px; border-radius:25px; font-size:16px; cursor:pointer;
 }
-
-/* ==================== 发布弹窗 ==================== */
 .input-modal {
   position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
   background:rgba(20,18,22,0.95); padding:30px; border-radius:12px;
@@ -156,15 +131,12 @@ body {
   background:#d4a554; color:#F5F0E1; border:none;
   padding:12px 30px; border-radius:8px; font-size:16px; cursor:pointer; float:right;
 }
-
-/* ==================== 详情弹窗（带顶部色条） ==================== */
 .detail-modal {
   position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
   background:rgba(20,18,22,0.95); padding:30px; border-radius:12px;
   width:500px; color:#F5F0E1; display:none; z-index:100;
-  padding-top: 40px; /* 给顶部色条留空间 */
+  padding-top: 40px;
 }
-/* 详情弹窗顶部色条 */
 .detail-top-bar {
   position:absolute; top:0; left:0; width:100%; height:11px;
   border-radius:12px 12px 0 0;
@@ -183,8 +155,6 @@ body {
 .detail-like { display:flex; align-items:center; gap:5px; cursor:pointer; }
 .heart-icon { font-size:16px; transition:0.2s; }
 .heart-icon.active { color:#ff4444; transform:scale(1.1); }
-
-/* 评论列表：心心念语+浅色评论 */
 .reply-list, .random-reply-list { 
   max-height:200px; overflow-y:auto; margin-bottom:15px; gap:10px; 
   display:flex; flex-direction:column;
@@ -192,13 +162,12 @@ body {
 .reply-item { 
   padding:10px; background:rgba(255,255,255,0.05); border-radius:6px;
 }
-/* 心心念语前缀 */
 .reply-prefix {
   color:#998877; font-size:12px; margin-bottom:4px; display:block;
 }
 .reply-content { 
   font-size:14px; margin-bottom:5px; 
-  color:#D8D0C0; /* 更浅的评论颜色 */
+  color:#D8D0C0;
   font-family: "SimSun", 宋体;
 }
 .reply-meta { 
@@ -216,8 +185,6 @@ body {
   background:#d4a554; color:#F5F0E1; border:none;
   padding:8px 16px; border-radius:6px; cursor:pointer; float:right;
 }
-
-/* ==================== 随机遇见弹窗（可评论） ==================== */
 .random-modal {
   position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
   background:rgba(20,18,22,0.95); padding:30px; border-radius:12px;
@@ -242,8 +209,6 @@ body {
   border-bottom:1px solid rgba(255,255,255,0.1);
 }
 .random-like { display:flex; align-items:center; gap:5px; cursor:pointer; }
-
-/* ==================== 全部查看列表（颜色筛选） ==================== */
 .all-list-modal {
   position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
   background:rgba(10,8,12,0.98); padding:20px; border-radius:12px;
@@ -265,16 +230,14 @@ body {
   border:2px solid transparent;
 }
 .color-tag.active { border-color:#d4a554; }
-/* 全部列表内容：滚动+网格布局 */
 .all-list-content {
   width:100%; height:calc(100% - 50px);
-  overflow-y:auto; /* 右侧滚动条 */
+  overflow-y:auto;
   display:grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* 适配60%便签 */
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap:15px;
   padding-right:5px;
 }
-/* 列表项样式 */
 .all-list-item {
   background:rgba(255,255,255,0.05); border-radius:8px;
   padding:15px; position:relative;
@@ -289,8 +252,6 @@ body {
   font-size:12px; color:#998877;
   display:flex; justify-content:space-between;
 }
-
-/* ==================== 我的絮语列表 ==================== */
 .my-list-modal {
   position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
   background:rgba(10,8,12,0.98); padding:20px; border-radius:12px;
@@ -304,7 +265,7 @@ body {
   width:100%; height:calc(100% - 50px);
   overflow-y:auto;
   display:grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* 适配60%便签 */
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap:15px;
 }
 .my-list-item {
@@ -321,16 +282,6 @@ body {
   font-size:12px; color:#998877;
   display:flex; justify-content:space-between;
 }
-
-/* 滚动条样式优化 */
-::-webkit-scrollbar {
-  width:6px;
-}
-::-webkit-scrollbar-track {
-  background:rgba(255,255,255,0.05);
-  border-radius:3px;
-}
-::-webkit-scrollbar-thumb {
-  background:rgba(212,165,84,0.5);
-  border-radius:3px;
-}
+::-webkit-scrollbar { width:6px; }
+::-webkit-scrollbar-track { background:rgba(255,255,255,0.05); border-radius:3px; }
+::-webkit-scrollbar-thumb { background:rgba(212,165,84,0.5); border-radius:3px; }
